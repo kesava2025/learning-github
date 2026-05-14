@@ -1,0 +1,43 @@
+name: Checkout Multiple Repos into Runner Workspace
+on: workflow_dispatch
+
+jobs:
+  runner-workspace:
+    runs-on: ubuntu-latest
+    # defaults:
+    #   run:
+    #     working-directory: /home/runner/work/learning-github/learning-github
+
+    steps:
+
+      - name: Print GitHub workspace
+        run: |
+          echo "GITHUB_WORKSPACE is:  $GITHUB_WORKSPACE"
+
+      - name: Checkout Self Repository
+        uses: actions/checkout@v4
+        with:
+          path: learning-github
+
+      - name: Checkout Github Repository
+        uses: actions/checkout@v4
+        with:
+          repository: 'sharmicloud/terraform-modules'
+          ref: main
+          path: terraform-modules
+          token: ${{ secrets.GHREPO_TOKEN }}
+
+      - name: List folders under working directory
+        run: |
+          echo "All Folders under $GITHUB_WORKSPACE:"
+          ls -la $GITHUB_WORKSPACE
+
+      - name: Show directory structure
+        run: |
+          REPO_NAME=${GITHUB_REPOSITORY##*/}
+          echo "Repo name is: $REPO_NAME"
+          echo "Self repository structure:"
+          tree "$REPO_NAME" || ls -R "$REPO_NAME"
+
+          echo "Other Github repository structure:"
+          tree aws-terraform || ls -R aws-terraform
